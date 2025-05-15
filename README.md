@@ -1,18 +1,20 @@
-# Fichajes Automáticos con Microsoft Graph API (Teams Shifts)
+# Fichajes automáticos en Teams Shifts (Microsoft Graph API)
 
-Este proyecto en PHP permite realizar fichajes automáticos (entrada, salida y descansos) mediante la API de Microsoft Graph, específicamente el módulo de **Shifts de Microsoft Teams**. Está diseñado para ejecutarse mediante `cron` cada 30 minutos, gestionando correctamente el estado del turno y los descansos según el horario configurado.
+Este proyecto en PHP permite realizar fichajes automáticos (entrada, salida y descansos) mediante la API de Microsoft Graph, específicamente el módulo de **Shifts de Microsoft Teams**. 
+Está diseñado para ejecutarse mediante `cron` cada 30 minutos, gestionando correctamente el estado del turno y los descansos según el horario configurado.
 
 ## 🧩 Estructura del Proyecto
 
-- `api.php`: Punto de entrada del script. Controla la lógica principal para decidir qué acción realizar (clockIn, startBreak, endBreak, clockOut).
+- `index.php`: Punto de entrada del script, controla la lógica principal para decidir qué acción realizar (clockIn, startBreak, endBreak, clockOut).
 - `config.php`: Contiene parámetros de configuración como el token de acceso, IDs de Teams, y márgenes de tolerancia.
 - `functions.php`: Funciones auxiliares para interactuar con la API de Microsoft Graph y manejar los estados.
+- `api.php`: Contiene las funciones para llamar al API de Microsoft para cada tipo de acción.
 
 ## 📦 Requisitos
 
 - PHP 7.4 o superior
 - Extensión `curl` habilitada
-- Acceso válido a la API de Microsoft Graph con permisos para `Shifts`, `TimeCard`, `Schedule.ReadWrite.All`
+- Acceso válido a la API de Microsoft Graph con permisos para `Shifts`, `TimeCard`, `Schedule.ReadWrite.All` mediante una aplicacion en EntraID.
 - Un sistema operativo con soporte para `cron` (si se desea automatizar)
 
 ## ⚙️ Instalación
@@ -26,10 +28,12 @@ Este proyecto en PHP permite realizar fichajes automáticos (entrada, salida y d
 
 2. Configura `config.php` con los siguientes datos:
 
-   - `ACCESS_TOKEN`: Token OAuth 2.0 con permisos necesarios
+   - `CLIENT_ID`: ID de aplicación de EntraID
+   - `CLIENT_SECRET`: El secreto de la aplicación
+   - `TENANT_ID`: ID del tenant donde esta creada la aplicación
    - `TEAM_ID`: ID del equipo de Microsoft Teams
    - `USER_ID`: ID del usuario a fichar
-   - `MARGEN_ANTES` y `MARGEN_DESPUES`: Margen de tiempo en minutos para ejecutar acciones automáticas
+   - `ACTION_MARGIN_MINUTES`: Margen de tiempo en minutos para ejecutar acciones automáticas
 
 3. Asegúrate de que `cron` puede ejecutar el script PHP correctamente (ver siguiente sección).
 
@@ -62,5 +66,5 @@ El `ACCESS_TOKEN` debe mantenerse en secreto. Se recomienda almacenarlo en un si
 
 ## 🧑‍💻 Autor
 
-Desarrollado por Nicolás Javier Martinez.
+Desarrollado por Nicolás Javier Martinez
 Contacto: [nicojmb@gmail.com]
