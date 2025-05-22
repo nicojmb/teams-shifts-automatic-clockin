@@ -5,10 +5,13 @@ Está diseñado para ejecutarse mediante `cron` cada 10 minutos, gestionando cor
 
 ## 🧩 Estructura del Proyecto
 
-- `index.php`: Punto de entrada del script, controla la lógica principal para decidir qué acción realizar (clockIn, startBreak, endBreak, clockOut).
-- `config.php`: Contiene parámetros de configuración como el token de acceso, IDs de Teams, y márgenes de tolerancia.
-- `functions.php`: Funciones auxiliares para interactuar con la API de Microsoft Graph y manejar los estados.
-- `api.php`: Contiene las funciones para llamar al API de Microsoft para cada tipo de acción.
+- `public/index.php`: Punto de entrada del script, controla la lógica principal para decidir qué acción realizar (clockIn, startBreak, endBreak, clockOut).
+- `src/config.php`: Contiene parámetros de configuración como el token de acceso, IDs de Teams, y márgenes de tolerancia.
+- `src/functions.php`: Funciones auxiliares para interactuar con la API de Microsoft Graph y manejar los estados.
+- `src/api.php`: Contiene las funciones para llamar al API de Microsoft para cada tipo de acción.
+- `.env`: Archivo a crear con las variables de entorno necesarias para la ejecución del script.
+- `logs/`: Carpeta donde se guardan los logs de ejecución del script.
+- `data/`: Carpeta donde se guardan el estado del TimeCard.
 
 ## 📦 Requisitos
 
@@ -40,11 +43,13 @@ Está diseñado para ejecutarse mediante `cron` cada 10 minutos, gestionando cor
 3. Prueba el resultado ejecutando:
 
    ```bash
-   php index.php
+   php .\public\index.php
    ```
 
    - Si todo está correcto, deberías ver un mensaje indicando que el script se ejecutó correctamente.
    - Si hay errores, revisa los logs generados en la carpeta `logs` para más detalles.
+   - Este archivo solo se puede ejecutar desde la línea de comandos, no desde un navegador web.
+   - Si el script se ejecuta desde un navegador, no se ejecutará correctamente y mostrará un error.
 
 4. Si quieres automatizarlo, tiene que crear un `cron` ejecutando el script PHP (ver siguiente sección).
 
@@ -53,7 +58,7 @@ Está diseñado para ejecutarse mediante `cron` cada 10 minutos, gestionando cor
 Agrega una tarea en `crontab -e` para que el script se ejecute cada 5 minutos:
 
 ```cron
-*/5 * * * * /usr/bin/php /index.php >> 2>&1
+*/5 * * * * /usr/bin/php /public/index.php >> 2>&1
 ```
 
 🔁 El script es inteligente:
