@@ -1,0 +1,25 @@
+# Ignorar archivos de entorno
+.env
+.env.*
+
+# Ignorar archivos de registro y caché
+*.log
+*.cache
+
+# Ignorar archivos temporales del sistema
+.DS_Store
+Thumbs.db
+
+# Ignorar archivos de respaldo
+*.bak
+*.old
+*.swp
+*.swo
+
+# Ignorar carpetas comunes de dependencias (si se utilizan)
+vendor/
+node_modules/
+
+# Ignorar carpetas que se generan automáticamente por el sistema
+data/
+logs/

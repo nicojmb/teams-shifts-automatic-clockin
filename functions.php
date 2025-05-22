@@ -1,5 +1,36 @@
 <?php
 
+function loadEnv($path = __DIR__ . '/.env')
+{
+    if (!file_exists($path))
+    {
+        return;
+    }
+
+    $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+    foreach ($lines as $line)
+    {
+        // Ignora comentarios
+        if (str_starts_with(trim($line), '#'))
+        {
+            continue;
+        }
+
+        // Divide clave=valor
+        list($key, $value) = explode('=', $line, 2);
+        $key = trim($key);
+        $value = trim($value);
+
+        // Quitar comillas si las hay
+        $value = trim($value, '"\'');
+
+        // Establecer variable de entorno
+        $_ENV[$key] = $value;
+        putenv("$key=$value");
+    }
+}
+
+
 function logMsg($msg, $level = 'INFO')
 {
     if (!is_dir(LOG_DIR))
@@ -44,10 +75,6 @@ function getAccessToken()
     {
         $curlOptions[CURLOPT_SSL_VERIFYPEER] = ENABLE_SSL_VERIFICATION;
         $curlOptions[CURLOPT_SSL_VERIFYHOST] = ENABLE_SSL_VERIFICATION ? 2 : 0;
-        if (!ENABLE_SSL_VERIFICATION)
-        {
-            logMsg("⚠️ ADVERTENCIA: La verificación SSL está DESHABILITADA para obtener el token de acceso. Solo para pruebas locales.", 'WARNING');
-        }
     }
     else
     {
@@ -214,3 +241,6 @@ function updateState($actionType, $timeCardId, &$currentStateData, DateTime $tim
 
     logMsg("---> Acción realizada: $actionType. TimeCardID: $timeCardId. Hora: " . $timestamp->format('H:i'));
 }
+
+// 
+loadEnv();

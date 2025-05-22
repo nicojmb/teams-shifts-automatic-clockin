@@ -36,10 +36,6 @@ function callGraphApi($url, $accessToken, $method = 'GET', $payload = null, $exp
     {
         $curlOptions[CURLOPT_SSL_VERIFYPEER] = ENABLE_SSL_VERIFICATION;
         $curlOptions[CURLOPT_SSL_VERIFYHOST] = ENABLE_SSL_VERIFICATION ? 2 : 0;
-        if (!ENABLE_SSL_VERIFICATION)
-        {
-            logMsg("⚠️ ADVERTENCIA: La verificación SSL está DESHABILITADA para la llamada a Graph API ($url). Solo para pruebas locales.", 'WARNING');
-        }
     }
     else
     {
@@ -119,7 +115,6 @@ function getShiftForUserAndDay(DateTime $targetDay)
     // Este filtro sigue buscando turnos que empiezan Y terminan estrictamente dentro del día local $targetDay
     $filter = "sharedShift/startDateTime+ge+$startOfDayForQueryUTC+and+sharedShift/endDateTime+le+$endOfDayForQueryUTC+";
 
-    logMsg("DEBUG: Filtro de turnos (tu lógica con UTC corregido): $filter", 'DEBUG');
     $url = "https://graph.microsoft.com/v1.0/teams/" . TEAM_ID . "/schedule/shifts?\$filter=" . $filter;
 
 

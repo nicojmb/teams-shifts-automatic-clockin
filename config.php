@@ -1,11 +1,11 @@
 <?php
 
-define('CLIENT_ID', 'xxx');
-define('CLIENT_SECRET', '');
-define('TENANT_ID', '');
+define('CLIENT_ID', getenv('CLIENT_ID', ''));
+define('CLIENT_SECRET', getenv('CLIENT_SECRET', ''));
+define('TENANT_ID', getenv('TENANT_ID', ''));
 
-define('USER_ID', '');
-define('TEAM_ID', '');
+define('USER_ID', getenv('USER_ID', ''));
+define('TEAM_ID',  getenv('TEAM_ID', ''));
 
 define('TEST_MODE', true);
 define('FIXED_TEST_TIME', ''); // Example: '2024-05-15 09:05:00' o '09:05:00'
