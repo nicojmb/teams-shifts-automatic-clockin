@@ -103,7 +103,7 @@ try
     {
         if (empty($lastAction) || $lastAction === 'clocked_out' || $currentState['currentShiftId'] !== $shiftId)
         {
-            logMsg("Intentando Clock-In para el turno: " . ($sharedShift['displayName'] ?? $shiftId), 'INFO');
+            logMsg("🟢 Intentando Clock-In para el turno: " . ($sharedShift['displayName'] ?? $shiftId), 'INFO');
             $newTimeCardId = doClockIn();
             updateState('clocked_in', $newTimeCardId, $currentState, $now, $shiftId);
             $timeCardId = $newTimeCardId;
@@ -121,7 +121,7 @@ try
 
             if ($now >= $breakStartBoundary && $now < $break['endDateTime'])
             {
-                logMsg("Intentando Iniciar Descanso: " . $break['displayName'], 'INFO');
+                logMsg("🕒 Intentando Iniciar Descanso: " . $break['displayName'], 'INFO');
                 doStartBreak($timeCardId, $break['displayName']);
                 updateState('break_started', $timeCardId, $currentState, $now, $shiftId, $break['displayName']);
                 logMsg("✅ Inicio de Descanso '" . $break['displayName'] . "' realizado.", 'SUCCESS');
@@ -150,7 +150,7 @@ try
 
             if ($now >= $breakEndBoundary && $now <= $maxTimeToEndBreak)
             {
-                logMsg("Intentando Finalizar Descanso: " . $currentActiveBreak['displayName'], 'INFO');
+                logMsg("🕒 Intentando Finalizar Descanso: " . $currentActiveBreak['displayName'], 'INFO');
                 doEndBreak($timeCardId, $currentActiveBreak['displayName']);
                 updateState('break_ended', $timeCardId, $currentState, $now, $shiftId);
                 logMsg("✅ Fin de Descanso '" . $currentActiveBreak['displayName'] . "' realizado.", 'SUCCESS');
@@ -179,14 +179,14 @@ try
 
         if ($now >= $shiftEndBoundary && $now <= $maxTimeToClockOut)
         {
-            logMsg("Intentando Clock-Out para el turno: " . ($sharedShift['displayName'] ?? $shiftId), 'INFO');
+            logMsg("🔴 Intentando Clock-Out para el turno: " . ($sharedShift['displayName'] ?? $shiftId), 'INFO');
             doClockOut($timeCardId);
             updateState('clocked_out', $timeCardId, $currentState, $now);
             logMsg("✅ Clock-Out realizado. TimeCardID: $timeCardId", 'SUCCESS');
         }
         elseif ($now > $maxTimeToClockOut)
         {
-            logMsg("Forzando Clock-Out (tiempo de turno excedido considerablemente): " . ($sharedShift['displayName'] ?? $shiftId), 'WARNING');
+            logMsg("🔴 Forzando Clock-Out (tiempo de turno excedido considerablemente): " . ($sharedShift['displayName'] ?? $shiftId), 'WARNING');
             doClockOut($timeCardId);
             updateState('clocked_out', $timeCardId, $currentState, $now);
             logMsg("✅ Clock-Out (forzado) realizado. TimeCardID: $timeCardId", 'SUCCESS');

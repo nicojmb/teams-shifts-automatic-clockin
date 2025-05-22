@@ -1,5 +1,10 @@
 <?php
 
+function sentTeamsMessage($msg)
+{
+    //TODO: Implementar la función para enviar mensajes a Teams
+}
+
 /**
  * Realiza una solicitud cURL a la API de Microsoft Graph.
  *
@@ -69,11 +74,23 @@ function callGraphApi($url, $accessToken, $method = 'GET', $payload = null, $exp
     if ($httpCode >= 200 && $httpCode < 300)
     {
         $responseData = json_decode($response, true);
+
         if (json_last_error() !== JSON_ERROR_NONE && !empty($response))
         {
             logMsg("⚠️ Respuesta no JSON de Graph API ($method $url) con código $httpCode: $response", "WARNING");
+
             return $response;
         }
+
+        try
+        {
+            sentTeamsMessage("✅ Llamada al API de Graph correcta - Respuesta: $httpCode ");
+        }
+        catch (Exception $e)
+        {
+            logMsg("⚠️ Error enviando mensaje a Teams: " . $e->getMessage(), 'WARNING');
+        }
+
         return $responseData;
     }
 
