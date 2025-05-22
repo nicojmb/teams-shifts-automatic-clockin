@@ -1,7 +1,7 @@
 # Fichajes automáticos en Teams Shifts (Microsoft Graph API)
 
-Este proyecto en PHP permite realizar fichajes automáticos (entrada, salida y descansos) mediante la API de Microsoft Graph, específicamente el módulo de **Shifts de Microsoft Teams**. 
-Está diseñado para ejecutarse mediante `cron` cada 30 minutos, gestionando correctamente el estado del turno y los descansos según el horario configurado.
+Este proyecto en PHP permite realizar fichajes automáticos (entrada, salida y descansos) mediante la API de Microsoft Graph, específicamente el módulo de **Shifts de Microsoft Teams**.
+Está diseñado para ejecutarse mediante `cron` cada 10 minutos, gestionando correctamente el estado del turno y los descansos según el horario configurado.
 
 ## 🧩 Estructura del Proyecto
 
@@ -12,7 +12,7 @@ Está diseñado para ejecutarse mediante `cron` cada 30 minutos, gestionando cor
 
 ## 📦 Requisitos
 
-- PHP 7.4 o superior
+- PHP 8 o superior
 - Extensión `curl` habilitada
 - Acceso válido a la API de Microsoft Graph con permisos para `Shifts`, `TimeCard`, `Schedule.ReadWrite.All` mediante una aplicacion en EntraID.
 - Un sistema operativo con soporte para `cron` (si se desea automatizar)
@@ -22,27 +22,38 @@ Está diseñado para ejecutarse mediante `cron` cada 30 minutos, gestionando cor
 1. Clona o descarga este repositorio en tu servidor:
 
    ```bash
-   git clone https://github.com/tuusuario/fichajes-teams.git
-   cd fichajes-teams
+   git clone https://github.com/nicojmb/teams-shifts-automatic-clockin
+   cd teams-shifts-automatic-clockin
    ```
 
-2. Configura `config.php` con los siguientes datos:
+2. Crea un archivo . `.env` como el siguiente:
 
-   - `CLIENT_ID`: ID de aplicación de EntraID
-   - `CLIENT_SECRET`: El secreto de la aplicación
-   - `TENANT_ID`: ID del tenant donde esta creada la aplicación
-   - `TEAM_ID`: ID del equipo de Microsoft Teams
-   - `USER_ID`: ID del usuario a fichar
-   - `ACTION_MARGIN_MINUTES`: Margen de tiempo en minutos para ejecutar acciones automáticas
+   ```dotenv
+   CLIENT_ID=
+   CLIENT_SECRET=
+   TENANT_ID=
+   USER_ID=
+   TEAM_ID=
 
-3. Asegúrate de que `cron` puede ejecutar el script PHP correctamente (ver siguiente sección).
+   ```
+
+3. Prueba el resultado ejecutando:
+
+   ```bash
+   php index.php
+   ```
+
+   - Si todo está correcto, deberías ver un mensaje indicando que el script se ejecutó correctamente.
+   - Si hay errores, revisa los logs generados en la carpeta `logs` para más detalles.
+
+4. Si quieres automatizarlo, tiene que crear un `cron` ejecutando el script PHP (ver siguiente sección).
 
 ## ⏱️ Automatización con Cron
 
-Agrega una tarea en `crontab -e` para que el script se ejecute cada 30 minutos:
+Agrega una tarea en `crontab -e` para que el script se ejecute cada 5 minutos:
 
 ```cron
-*/30 * * * * /usr/bin/php /ruta/a/tu/proyecto/api.php >> /ruta/a/tu/logs/fichajes.log 2>&1
+*/5 * * * * /usr/bin/php /index.php >> 2>&1
 ```
 
 🔁 El script es inteligente:
