@@ -15,7 +15,7 @@ function callGraphApi($url, $accessToken, $method = 'GET', $payload = null, $exp
 {
     $headers = [
         "Authorization: Bearer $accessToken",
-        "MS-APP-ACTS-AS: " . USER_ID, // Actuar en nombre del usuario configurado
+        "MS-APP-ACTS-AS: " . USER_ID,
     ];
 
     if ($payload !== null)
@@ -31,7 +31,6 @@ function callGraphApi($url, $accessToken, $method = 'GET', $payload = null, $exp
         CURLOPT_CUSTOMREQUEST => $method,
     ];
 
-    // Aplicar configuración SSL parametrizable
     if (defined('ENABLE_SSL_VERIFICATION'))
     {
         $curlOptions[CURLOPT_SSL_VERIFYPEER] = ENABLE_SSL_VERIFICATION;
@@ -39,7 +38,6 @@ function callGraphApi($url, $accessToken, $method = 'GET', $payload = null, $exp
     }
     else
     {
-        // Comportamiento por defecto si no está definida la constante (recomendado: true)
         $curlOptions[CURLOPT_SSL_VERIFYPEER] = true;
         $curlOptions[CURLOPT_SSL_VERIFYHOST] = 2;
     }
@@ -63,13 +61,11 @@ function callGraphApi($url, $accessToken, $method = 'GET', $payload = null, $exp
     $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
     curl_close($ch);
 
-    // Éxito si es 204 y se esperaba "No Content"
     if ($expectNoContent && $httpCode === 204)
     {
         return "204 No Content";
     }
 
-    // Éxito si es un código 2xx y no se esperaba específicamente 204
     if ($httpCode >= 200 && $httpCode < 300)
     {
         $responseData = json_decode($response, true);
@@ -81,7 +77,6 @@ function callGraphApi($url, $accessToken, $method = 'GET', $payload = null, $exp
         return $responseData;
     }
 
-    // Si no es un código de éxito
     $errorMsg = "❌ Error ($httpCode) en la API ($method $url): ";
     $decodedResponse = json_decode($response, true);
     if (isset($decodedResponse['error']['message']))
@@ -101,18 +96,15 @@ function getShiftForUserAndDay(DateTime $targetDay)
 {
     $accessToken = getAccessToken();
 
-    $localTimezone = new DateTimeZone(TIMEZONE); // Tu zona horaria local
-    $utcTimezone = new DateTimeZone('UTC');    // Zona horaria UTC
+    $localTimezone = new DateTimeZone(TIMEZONE);
+    $utcTimezone = new DateTimeZone('UTC');
 
-    // Inicio y fin del día en la zona horaria local
     $startOfDayLocal = (clone $targetDay)->setTime(0, 0, 0)->setTimezone($localTimezone);
     $endOfDayLocal = (clone $targetDay)->setTime(23, 59, 59)->setTimezone($localTimezone);
 
-    // Convertir estas fechas a UTC para la consulta de Graph API
     $startOfDayForQueryUTC = (clone $startOfDayLocal)->setTimezone($utcTimezone)->format('Y-m-d\TH:i:s\Z');
     $endOfDayForQueryUTC = (clone $endOfDayLocal)->setTimezone($utcTimezone)->format('Y-m-d\TH:i:s\Z');
 
-    // Este filtro sigue buscando turnos que empiezan Y terminan estrictamente dentro del día local $targetDay
     $filter = "sharedShift/startDateTime+ge+$startOfDayForQueryUTC+and+sharedShift/endDateTime+le+$endOfDayForQueryUTC+";
 
     $url = "https://graph.microsoft.com/v1.0/teams/" . TEAM_ID . "/schedule/shifts?\$filter=" . $filter;
@@ -137,9 +129,6 @@ function getShiftForUserAndDay(DateTime $targetDay)
 
         if (!empty($userShifts))
         {
-            // Podría haber múltiples turnos que se solapen.
-            // Ordenar por hora de inicio y tomar el primero que esté activo o más próximo.
-            // Por ahora, tomamos el primero encontrado.
             usort($userShifts, function ($a, $b)
             {
                 return new DateTime($a['sharedShift']['startDateTime']) <=> new DateTime($b['sharedShift']['startDateTime']);

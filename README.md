@@ -77,5 +77,4 @@ El `ACCESS_TOKEN` debe mantenerse en secreto. Se recomienda almacenarlo en un si
 
 ## 🧑‍💻 Autor
 
-Desarrollado por Nicolás Javier Martinez
-Contacto: [nicojmb@gmail.com]
+Desarrollado por Nicolás Javier Martinez | @nicojmb - [nicojmb@gmail.com]

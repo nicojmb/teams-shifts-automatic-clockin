@@ -10,21 +10,15 @@ function loadEnv($path = __DIR__ . '/.env')
     $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
     foreach ($lines as $line)
     {
-        // Ignora comentarios
         if (str_starts_with(trim($line), '#'))
         {
             continue;
         }
 
-        // Divide clave=valor
         list($key, $value) = explode('=', $line, 2);
         $key = trim($key);
         $value = trim($value);
-
-        // Quitar comillas si las hay
         $value = trim($value, '"\'');
-
-        // Establecer variable de entorno
         $_ENV[$key] = $value;
         putenv("$key=$value");
     }
@@ -35,10 +29,8 @@ function logMsg($msg, $level = 'INFO')
 {
     if (!is_dir(LOG_DIR))
     {
-        // Intentar crear el directorio con permisos definidos
         if (!mkdir(LOG_DIR, DIR_PERMISSIONS, true) && !is_dir(LOG_DIR))
         {
-            // Falló la creación del directorio, usar error_log como fallback
             error_log("Error creating log directory: " . LOG_DIR . ". Log message: [$level] $msg");
             return;
         }
@@ -58,7 +50,7 @@ function getAccessToken()
     $postData = http_build_query([
         'grant_type' => 'client_credentials',
         'client_id' => CLIENT_ID,
-        'client_secret' => CLIENT_SECRET, // ¡¡PROTEGER ESTO!! Ver config.php
+        'client_secret' => CLIENT_SECRET,
         'scope' => 'https://graph.microsoft.com/.default',
     ]);
 
@@ -70,7 +62,6 @@ function getAccessToken()
         CURLOPT_HTTPHEADER => ["Content-Type: application/x-www-form-urlencoded"],
     ];
 
-    // Aplicar configuración SSL parametrizable
     if (defined('ENABLE_SSL_VERIFICATION'))
     {
         $curlOptions[CURLOPT_SSL_VERIFYPEER] = ENABLE_SSL_VERIFICATION;
@@ -78,7 +69,6 @@ function getAccessToken()
     }
     else
     {
-        // Comportamiento por defecto si no está definida la constante (recomendado: true)
         $curlOptions[CURLOPT_SSL_VERIFYPEER] = true;
         $curlOptions[CURLOPT_SSL_VERIFYHOST] = 2;
     }
@@ -120,13 +110,13 @@ function getData()
         }
     }
 
-    $file = DATA_DIR . '/state.json'; // Cambiado de data.json a state.json para reflejar mejor su propósito
+    $file = DATA_DIR . '/state.json';
     $data = [
         'activeTimeCardId' => null,
-        'lastAction' => null, // 'clocked_in', 'clocked_out', 'break_started', 'break_ended'
+        'lastAction' => null,
         'lastActionTimestamp' => null,
         'currentShiftId' => null,
-        'currentBreakDisplayName' => null // Para saber en qué descanso específico estamos
+        'currentBreakDisplayName' => null
     ];
 
     if (file_exists($file))
@@ -139,8 +129,8 @@ function getData()
         }
 
         if (flock($fp, LOCK_SH))
-        { // Bloqueo compartido para lectura
-            $content = stream_get_contents($fp); // Más seguro que filesize + fread para concurrencia
+        {
+            $content = stream_get_contents($fp);
             flock($fp, LOCK_UN);
             fclose($fp);
 
@@ -149,7 +139,6 @@ function getData()
                 $decodedData = json_decode($content, true);
                 if (json_last_error() === JSON_ERROR_NONE && is_array($decodedData))
                 {
-                    // Fusionar con valores por defecto para asegurar que todas las claves existan
                     $data = array_merge($data, $decodedData);
                 }
                 else
@@ -180,7 +169,7 @@ function saveData($data)
     }
 
     $file = DATA_DIR . '/state.json';
-    $fp = fopen($file, 'c+'); // Crear si no existe, truncar si existe.
+    $fp = fopen($file, 'c+');
     if (!$fp)
     {
         logMsg("❌ No se pudo abrir state.json para escritura", 'ERROR');
@@ -188,30 +177,20 @@ function saveData($data)
     }
 
     if (!flock($fp, LOCK_EX))
-    { // Bloqueo exclusivo para escritura
+    {
         fclose($fp);
         logMsg("❌ No se pudo obtener bloqueo exclusivo para escribir state.json", 'ERROR');
         throw new Exception("No se pudo obtener bloqueo exclusivo para escribir state.json");
     }
 
-    ftruncate($fp, 0);      // Truncar el archivo
-    rewind($fp);            // Mover el puntero al inicio
+    ftruncate($fp, 0);
+    rewind($fp);
     fwrite($fp, json_encode($data, JSON_PRETTY_PRINT));
-    fflush($fp);            // Asegurar que se escribe en disco
-    flock($fp, LOCK_UN);    // Liberar el bloqueo
+    fflush($fp);
+    flock($fp, LOCK_UN);
     fclose($fp);
 }
 
-/**
- * Actualiza y registra el estado de la acción.
- *
- * @param string $actionType El tipo de acción (e.g., 'clocked_in', 'break_started').
- * @param string|null $timeCardId El ID de la tarjeta de tiempo, si aplica.
- * @param array &$currentStateData Array del estado actual, se modificará por referencia.
- * @param DateTime $timestamp La hora de la acción.
- * @param string|null $shiftId El ID del turno actual, si aplica.
- * @param string|null $breakDisplayName El nombre del descanso, si aplica.
- */
 function updateState($actionType, $timeCardId, &$currentStateData, DateTime $timestamp, $shiftId = null, $breakDisplayName = null)
 {
     $currentStateData['lastAction'] = $actionType;
@@ -221,12 +200,10 @@ function updateState($actionType, $timeCardId, &$currentStateData, DateTime $tim
     {
         $currentStateData['activeTimeCardId'] = $timeCardId;
         $currentStateData['currentShiftId'] = $shiftId;
-        $currentStateData['currentBreakDisplayName'] = null; // Reset break on clock-in
+        $currentStateData['currentBreakDisplayName'] = null;
     }
     elseif ($actionType === 'clocked_out')
     {
-        // activeTimeCardId se podría limpiar, pero mantenerlo puede ser útil para el último log de la sesión.
-        // $currentStateData['activeTimeCardId'] = null; // Opcional
         $currentStateData['currentShiftId'] = null;
         $currentStateData['currentBreakDisplayName'] = null;
     }
@@ -242,5 +219,5 @@ function updateState($actionType, $timeCardId, &$currentStateData, DateTime $tim
     logMsg("---> Acción realizada: $actionType. TimeCardID: $timeCardId. Hora: " . $timestamp->format('H:i'));
 }
 
-// 
+########### LOAD ENV ##########
 loadEnv();
