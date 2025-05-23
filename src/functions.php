@@ -116,8 +116,11 @@ function getData()
         'lastAction' => null,
         'lastActionTimestamp' => null,
         'currentShiftId' => null,
-        'currentBreakDisplayName' => null
+        'currentBreakDisplayName' => null,
+        'cachedShift' => null,
+        'cachedShiftDate' => null
     ];
+
 
     if (file_exists($file))
     {

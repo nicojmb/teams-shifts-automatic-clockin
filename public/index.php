@@ -65,9 +65,24 @@ try
     }
     else
     {
-        $shift = getShiftForUserAndDay($now);
-        $shouldCheckAgain = $shift === null;
-        setLastShiftCheckStatus($todayStr, $shouldCheckAgain);
+        if (isset($currentState['cachedShiftDate']) && $currentState['cachedShiftDate'] === $todayStr && !empty($currentState['cachedShift']))
+        {
+            $shift = $currentState['cachedShift'];
+            logMsg("📦 Reutilizando turno guardado localmente para hoy ($todayStr).", 'DEBUG');
+        }
+        else
+        {
+            $shift = getShiftForUserAndDay($now);
+            $shouldCheckAgain = $shift === null;
+            setLastShiftCheckStatus($todayStr, $shouldCheckAgain);
+
+            if ($shift !== null)
+            {
+                $currentState['cachedShift'] = $shift;
+                $currentState['cachedShiftDate'] = $todayStr;
+                saveData($currentState);
+            }
+        }
     }
 
     if (empty($shift) || !isset($shift['sharedShift']))
