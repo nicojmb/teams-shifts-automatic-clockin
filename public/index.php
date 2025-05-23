@@ -110,6 +110,7 @@ try
         }
 
         logMsg("El proceso ha finalizado. No hay turnos activos y/o el usuario no está fichado o ya se ha gestionado.", 'INFO');
+        logMsg("-------------------------------", 'DEBUG');
         exit;
     }
 
@@ -239,5 +240,6 @@ try
 catch (Exception $e)
 {
     logMsg("Error fatal durante el proceso: " . $e->getMessage(), 'ERROR');
+    logMsg("-------------------------------", 'DEBUG');
     exit(1);
 }
