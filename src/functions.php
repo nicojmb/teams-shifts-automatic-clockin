@@ -191,6 +191,19 @@ function saveData($data)
     fclose($fp);
 }
 
+function getLastShiftCheckStatus()
+{
+    $file = DATA_DIR . '/last_shift_check.json';
+    if (!file_exists($file)) return ['date' => '', 'shouldCheckAgain' => true];
+    return json_decode(file_get_contents($file), true);
+}
+
+function setLastShiftCheckStatus($date, $shouldCheckAgain)
+{
+    $file = DATA_DIR . '/last_shift_check.json';
+    file_put_contents($file, json_encode(['date' => $date, 'shouldCheckAgain' => $shouldCheckAgain]));
+}
+
 function updateState($actionType, $timeCardId, &$currentStateData, DateTime $timestamp, $shiftId = null, $breakDisplayName = null)
 {
     $currentStateData['lastAction'] = $actionType;
