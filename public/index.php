@@ -62,12 +62,12 @@ try
         if (!empty($currentState['cachedShift']))
         {
             $shift = $currentState['cachedShift'];
-            logMsg("📦 Reutilizando turno guardado localmente para hoy ($todayStr).", 'DEBUG');
+            logMsg("Reutilizando turno guardado localmente para hoy ($todayStr).", 'DEBUG');
         }
         else
         {
             $shift = null;
-            logMsg("📦 No se encontró turno guardado localmente para hoy ($todayStr). Hoy no se debe fichar.", 'DEBUG');
+            logMsg("No se encontró turno guardado localmente para hoy ($todayStr). Hoy no se debe fichar.", 'DEBUG');
         }
     }
     else
@@ -120,7 +120,8 @@ try
     $shiftStart = (new DateTime($sharedShift['startDateTime'], new DateTimeZone('UTC')))->setTimezone($timezone);
     $shiftEnd = (new DateTime($sharedShift['endDateTime'], new DateTimeZone('UTC')))->setTimezone($timezone);
 
-    logMsg("Turno encontrado: " . ($sharedShift['displayName'] ?? 'Sin nombre') . " (ID: $shiftId, Inicia: " . $shiftStart->format('Y-m-d H:i') . ", Fin: " . $shiftEnd->format('Y-m-d H:i') . ")", 'INFO');
+    logMsg("TURNOS (1):", 'INFO');
+    logMsg("---> Turno 1: " . ($sharedShift['displayName'] ?? 'Completo') . " (Inicio: " . $shiftStart->format('Y-m-d H:i') . ", Fin: " . $shiftEnd->format('Y-m-d H:i') . ")", 'INFO');
 
     ########### GET BREAKS ##########
 
@@ -128,7 +129,7 @@ try
 
     if (!empty($breaks))
     {
-        logMsg("Descansos encontrados (" . count($breaks) . "):", 'INFO');
+        logMsg("DESCANSOS (" . count($breaks) . "):", 'INFO');
         foreach ($breaks as $idx => $break)
         {
             logMsg("---> Descanso " . ($idx + 1) . ": " . $break['displayName'] . " (Inicio: " . $break['startDateTime']->format('H:i') . ", Fin: " . $break['endDateTime']->format('H:i') . ")", 'INFO');
@@ -235,7 +236,9 @@ try
     }
 
     saveData($currentState);
-    logMsg("Estado actualizado guardado correctamente.", 'DEBUG');
+
+    logMsg("El proceso ha finalizado.", 'INFO');
+    logMsg("-------------------------------", 'DEBUG');
 }
 catch (Exception $e)
 {
