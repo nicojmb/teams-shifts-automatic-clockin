@@ -60,11 +60,6 @@ try
 
     if ($status['date'] === $todayStr && !$status['shouldCheckAgain'])
     {
-        logMsg("✅ Ya se revisó que no hay turno hoy. No se consulta de nuevo.");
-        $shift = null;
-    }
-    else
-    {
         if (isset($currentState['cachedShiftDate']) && $currentState['cachedShiftDate'] === $todayStr && !empty($currentState['cachedShift']))
         {
             $shift = $currentState['cachedShift'];
