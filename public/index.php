@@ -48,10 +48,10 @@ try
         $now = new DateTime("now", $timezone);
     }
 
-    logMsg("Iniciando proceso de fichaje. Hora actual: " . $now->format('Y-m-d H:i:s P'));
+    logMsg("Iniciando ciclo de fichaje. Hora actual: " . $now->format('Y-m-d H:i:s P'));
 
     $currentState = getData();
-    logMsg("Estado actual cargado: " . json_encode($currentState), 'DEBUG');
+    logMsg("Se ha cargado el último estado registrado: " . json_encode($currentState), 'DEBUG');
 
     ########### GET SHIFT ##########
 
@@ -237,7 +237,7 @@ try
 
     saveData($currentState);
 
-    logMsg("El proceso ha finalizado.", 'INFO');
+    logMsg("El ciclo actual ha finalizado. Se ha guardado el estado para el proximo ciclo.", 'INFO');
     logMsg("-------------------------------", 'DEBUG');
 }
 catch (Exception $e)
