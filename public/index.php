@@ -55,28 +55,33 @@ try
 
     ########### GET SHIFT ##########
 
-    $status = getLastShiftCheckStatus();
     $todayStr = $now->format('Y-m-d');
 
-    if ($status['date'] === $todayStr && !$status['shouldCheckAgain'])
+    if (isset($currentState['cachedShiftDate']) && $currentState['cachedShiftDate'] === $todayStr)
     {
-        if (isset($currentState['cachedShiftDate']) && $currentState['cachedShiftDate'] === $todayStr && !empty($currentState['cachedShift']))
+        if (!empty($currentState['cachedShift']))
         {
             $shift = $currentState['cachedShift'];
             logMsg("📦 Reutilizando turno guardado localmente para hoy ($todayStr).", 'DEBUG');
         }
         else
         {
-            $shift = getShiftForUserAndDay($now);
-            $shouldCheckAgain = $shift === null;
-            setLastShiftCheckStatus($todayStr, $shouldCheckAgain);
+            $shift = null;
+            logMsg("📦 No se encontró turno guardado localmente para hoy ($todayStr). Hoy no se debe fichar.", 'DEBUG');
+        }
+    }
+    else
+    {
+        $currentState['cachedShift'] = null;
+        $currentState['cachedShiftDate'] = $todayStr;
 
-            if ($shift !== null)
-            {
-                $currentState['cachedShift'] = $shift;
-                $currentState['cachedShiftDate'] = $todayStr;
-                saveData($currentState);
-            }
+        $shift = getShiftForUserAndDay($now);
+
+        if ($shift !== null)
+        {
+            $currentState['cachedShift'] = $shift;
+            $currentState['cachedShiftDate'] = $todayStr;
+            saveData($currentState);
         }
     }
 
@@ -150,7 +155,7 @@ try
     }
 
     // Break Start
-    if ($timeCardId && isClockedIn($currentState) && $currentState['currentShiftId'] === $shiftId && !empty($breaks))
+    if ($timeCardId && (isClockedIn($currentState) || $currentState['lastAction'] === 'break_ended') && $currentState['currentShiftId'] === $shiftId && !empty($breaks))
     {
         foreach ($breaks as $break)
         {
